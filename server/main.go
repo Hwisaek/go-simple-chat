@@ -21,16 +21,17 @@ func main() {
 
 	client := common.NewClient(conn)
 
+	buffer := make([]byte, common.BuffSize)
 	for {
-		msg, netErr := client.Read()
-		if netErr != nil {
+		n, err := client.Read(buffer)
+		if err != nil {
 			return
 		}
 
-		log.Println(msg.Body)
-		netErr = client.Write(msg.Body)
-		if netErr != nil {
-			log.Fatal(netErr)
+		log.Println(string(buffer[:n]))
+		err = client.Write(string(buffer[:n]))
+		if err != nil {
+			log.Fatal(err)
 		}
 	}
 }

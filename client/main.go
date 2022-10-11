@@ -22,14 +22,15 @@ func main() {
 
 	client := common.NewClient(conn)
 
+	buffer := make([]byte, common.BuffSize)
 	go func() {
 		for {
-			msg, readErr := client.Read()
-			if readErr != nil {
+			n, err := client.Read(buffer)
+			if err != nil {
 				return
 			}
 
-			log.Println(msg.Body)
+			log.Println(string(buffer[:n]))
 		}
 	}()
 	for s.Scan() {
