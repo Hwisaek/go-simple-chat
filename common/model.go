@@ -3,15 +3,20 @@ package common
 import (
 	"bufio"
 	"bytes"
+	"crypto/rand"
 	"encoding/gob"
 	"fmt"
-	"math/rand"
+	"math/big"
 	"net"
 )
 
 type Msg struct {
 	Id   string
 	Body string
+}
+
+func (m Msg) String() string {
+	return m.Id + ": " + m.Body
 }
 
 type Client struct {
@@ -26,8 +31,9 @@ type Client struct {
 
 func NewClient(conn net.Conn) (client Client) {
 	var codecBuffer bytes.Buffer
+	n, _ := rand.Int(rand.Reader, big.NewInt(10))
 	client = Client{
-		Id:          fmt.Sprint(rand.Int()),
+		Id:          fmt.Sprint(n),
 		Conn:        &conn,
 		writer:      bufio.NewWriter(conn),
 		reader:      bufio.NewReader(conn),
@@ -38,12 +44,7 @@ func NewClient(conn net.Conn) (client Client) {
 	return
 }
 
-func (c Client) Write(s string) (err error) {
-	msg := Msg{
-		Id:   c.Id,
-		Body: s,
-	}
-
+func (c Client) Write(msg Msg) (err error) {
 	if err = c.enc.Encode(msg); err != nil {
 		return err
 	}
@@ -70,11 +71,10 @@ func (c Client) Read() (msg Msg, err error) {
 		data := buffer[:n]
 		c.codecBuffer.Write(data)
 
-		msg = Msg{}
 		if err = c.dec.Decode(&msg); err != nil {
 			return
 		}
 	}
 
-	return msg, nil
+	return
 }

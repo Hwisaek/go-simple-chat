@@ -26,7 +26,7 @@ func main() {
 	}()
 
 	client := common.NewClient(conn)
-
+	fmt.Println("id: ", client.Id)
 	go func() {
 		for {
 			msg, err := client.Read()
@@ -34,12 +34,16 @@ func main() {
 				return
 			}
 
-			log.Println(msg.Body)
+			log.Println(msg)
 		}
 	}()
 	for s.Scan() {
-		msg := s.Text()
+		txt := s.Text()
 
+		msg := common.Msg{
+			Id:   client.Id,
+			Body: txt,
+		}
 		err = client.Write(msg)
 		if err != nil {
 			return
