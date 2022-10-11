@@ -12,7 +12,12 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer listener.Close()
+	defer func() {
+		err = listener.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}()
 
 	conn, err := listener.Accept()
 	if err != nil {
