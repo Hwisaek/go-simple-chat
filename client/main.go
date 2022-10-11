@@ -27,15 +27,14 @@ func main() {
 
 	client := common.NewClient(conn)
 
-	buffer := make([]byte, common.BuffSize)
 	go func() {
 		for {
-			n, err := client.Read(buffer)
+			msg, err := client.Read()
 			if err != nil {
 				return
 			}
 
-			log.Println(string(buffer[:n]))
+			log.Println(msg.Body)
 		}
 	}()
 	for s.Scan() {

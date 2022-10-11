@@ -26,15 +26,14 @@ func main() {
 
 	client := common.NewClient(conn)
 
-	buffer := make([]byte, common.BuffSize)
 	for {
-		n, err := client.Read(buffer)
+		msg, err := client.Read()
 		if err != nil {
 			return
 		}
 
-		log.Println(string(buffer[:n]))
-		err = client.Write(string(buffer[:n]))
+		log.Println(msg.Body)
+		err = client.Write(msg.Body)
 		if err != nil {
 			log.Fatal(err)
 		}
